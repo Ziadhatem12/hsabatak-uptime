@@ -1,0 +1,17 @@
+name: amserry-ads-sync
+# Hourly: asks amserry.com to pull the last 3 days of Meta ad spend (read-only Meta calls). Moved from kvm2 cron "7 * * * *".
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch:
+permissions: {}
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - env:
+          K: ${{ secrets.AMSERRY_CRON_KEY }}
+        run: |
+          out=$(curl -sS --connect-timeout 5 --max-time 40 "https://amserry.com/ads-sync.php?k=$K")
+          echo "$(date -u +%FT%TZ) ${out:0:500}"
